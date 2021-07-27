@@ -32,6 +32,8 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class enrol_mobbexpayment_plugin extends enrol_plugin {
+
+
     /**
      * Lists all currencies available for plugin.
      * @return $currencies
@@ -83,6 +85,7 @@ class enrol_mobbexpayment_plugin extends enrol_plugin {
         }
         return array();
     }
+
     /**
      * Lists all protected user roles.
      * @return bool(true or false)

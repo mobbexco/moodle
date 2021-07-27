@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Listens for Instant Payment Notification from Stripe
+ * Listens for Instant Payment Notification from Mobbex
  *
- * This script waits for Payment notification from Stripe,
- * then double checks that data by sending it back to Stripe.
- * If Stripe verifies this then it sets up the enrolment for that
+ * This script waits for Payment notification from Mobbex,
+ * then double checks that data by sending it back to Mobbex.
+ * If Mobbex verifies this then it sets up the enrolment for that
  * user.
  *
  * @package    enrol_mobbexpayment
@@ -33,6 +33,7 @@ global $CFG;
 ?>
 
 <?php
+    echo filter_input(INPUT_GET, 'status', FILTER_SANITIZE_URL);
     $_SESSION['description'] = $coursefullname;
     $_SESSION['courseid'] = $course->id;
     $_SESSION['currency'] = $instance->currency;              
@@ -60,8 +61,8 @@ global $CFG;
 </script>
 
 <style>
-#region-main h2 { display:none; }
-.enrolmenticons { display: none;}
+    #region-main h2 { display:none; }
+    .enrolmenticons { display: none;}
 </style>
 
 <div align="center">
@@ -70,10 +71,6 @@ global $CFG;
         <p><?php print_string("paymentrequired") ?></p>
         <!-- <p><b><?php echo $instancename; ?></b></p> //-->
         <p><b><?php echo get_string("cost").": {$instance->currency} {$cost}"; ?></b></p>
-        <div class="couponcode-wrap">
-            <input type=text id="coupon"/>
-            <button id="apply"><?php echo get_string("applycode", "enrol_mobbexpayment"); ?></button>
-        </div>
 
         <form id="form_data_new" action="" method="post">
             <input id="form_data_new_data" type="hidden" name="data" value="" />
@@ -88,43 +85,99 @@ global $CFG;
                     $cost = $dataa;
                     $couponid = required_param('coupon_id', PARAM_RAW);
                 }
-                //$_SESSION['amount'] = get_mobbex_amount($cost, $_SESSION['currency'], false);
-
                 echo "<p><b> Final Cost : $instance->currency $cost </b></p>";
             ?>
 
             <?php 
                 $costvalue = str_replace(".", "", $cost);
                 if ($costvalue == 000) {  ?>
-                    <div id="amountequalzero">
-                        <button id="card-button-zero">
+                    <div id="amountequalzeromobbex">
+                        <button id="card-button-zero-mobbex">
                             Enrol Now
                         </button>
                     </div>
                     <br>
                     <script type="text/javascript">
-                        $(document.body).on('click', '#card-button-zero' ,function(){
+                        $(document.body).on('click', '#card-button-zero-mobbex' ,function(){
                             var cost = "<?php echo str_replace(".", "", $cost); ?>";
                             if (cost == 000) {
-                            document.getElementById("mobbexformfree").submit();
+                                document.getElementById("mobbexformfree").submit();
                             }
                         });
                     </script>
             <?php } else { ?>
 
                 <!-- placeholder for Elements -->
-                <div id="amountgreaterzero">
+                <div id="amountgreaterzeromobbex">
                     <strong>
                     <div id="card-element"></div> <br>
-                    <button id="card-button">
+                    <button id="card-button-mobbex">
                         Submit Payment
                     </button>
-                    <div id="transaction-status">
+                    <div id="transaction-status-mobbex">
                         <center> Your transaction is processing. Please wait... </center>
                     </div>
                     </strong>
                 </div>
             <?php } ?>
+
+        
+        <script type="text/javascript">
+            var style = {
+                base: {
+                    fontSize:'15px',
+                    color:'#000',
+                    '::placeholder': {
+                    color: '#000',
+                    }
+                },
+            };
+
+            //var cardElement = document.createElement('card', {style: style});
+            //cardElement.mount('#card-element');
+            var cardholderName = "<?php echo $userfullname; ?>";
+            var emailId = "<?php echo $USER->email; ?>";
+            var amount = "<?php echo $cost; ?>";
+            console.info(amount);
+            var cardButton = document.getElementById('card-button-mobbex');
+            var status = 0;
+            var postal = null;
+            console.log("<?php echo $CFG->wwwroot; ?>/enrol/mobbexpayment/payment.php");
+
+            cardButton.addEventListener('click', function(event) {
+                if (event.error) {
+                    status = 0;
+                } else {
+                    status = 1;
+                }
+
+                if (status == 0 || status == null) {
+                    $("#transaction-status-mobbex").css("display", "none");
+                    console.info("Error event");
+                } else {
+                    $("#transaction-status-mobbex").css("display", "block");
+                    $("#card-button-mobbex").attr("disabled", true);
+                
+                    $.ajax({
+                        url: "<?php echo $CFG->wwwroot; ?>/enrol/mobbexpayment/payment.php",
+                        type: 'GET',
+                        data: {
+                            'receiptemail' : emailId,
+                            'amount' : amount,
+                        },
+                    })
+                    .done(function( data ) {
+                        console.info( "Data Saved: "+ data );
+                        window.location.href = data;
+                    })
+                    .fail(function() {
+                        console.error("Error in ajax call");
+                    });
+                
+                }
+            });
+
+        </script>
 
     <form id="mobbexformfree" action="<?php
         echo "$CFG->wwwroot/enrol/mobbexpayment/free_enrol.php"?>" method="post">
@@ -167,7 +220,7 @@ global $CFG;
 .couponcode-wrap input#coupon{
     margin: 0 6px;
 }
-div#transaction-status, div#transaction-status-zero {
+div#transaction-status-mobbex, div#transaction-status-mobbex-zero {
     margin: 15px;
     background: antiquewhite;
     color: chocolate;
@@ -175,7 +228,7 @@ div#transaction-status, div#transaction-status-zero {
 }
 .CardField-input-wrapper{ overflow: inherit;} 
 .coursebox .content .summary{width:100%}
-button#apply, button#card-button, button#card-button-zero{
+button#apply, button#card-button, button#card-button-zero-mobbex{
    color: #fff;
    background-color: #1177d1;
    border: 1px solid #1177d1;
@@ -217,42 +270,18 @@ body#page-enrol-index #region-main .generalbox:last-of-type {
    font-size: 2rem;
    text-transform: capitalize;
 }
-.StripeElement {
+.MobbexElement {
     padding: 15px;
     border: 1px solid #e9ebec;
     background: #f9f9f9;
     box-shadow: 0 10px 6px -4px #d4d2d2;
 }
-.StripeElement input[placeholder], [placeholder], *[placeholder] {
+.MobbexElement input[placeholder], [placeholder], *[placeholder] {
     color: red !important;
 }
-@media (min-width: 200px) and (max-width: 700px) {
+@media (min-width: 200px) and (max-width: 750px) {
 #region-main{
     padding:0;
-}   z
-.generalbox {
-   width: 300px;} 
-body#page-enrol-index #region-main .generalbox:last-of-type{
- width: 320px;
- margin: 0 auto;
- float: none;
-} 
-#page-enrol-index p{
- text-align: center;
-} 
-#apply{
- margin-top: 10px;
-}
-#coupon{
- margin-top:10px;
-}
-#page-enrol-index #region-main-box .card-title{
- text-align: center;
-}
-#page-enrol-index #region-main-box .card-title:before, #page-enrol-index #region-main-box .card-title:after{
- display: none;
-}
-.couponcode-wrap { display: block;
-}
+}  
 }
 </style>

@@ -15,16 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Listens for Instant Payment Notification from Stripe
+ * Listens for Instant Payment Notification from mobbex
  *
- * This script waits for Payment notification from Stripe,
- * then double checks that data by sending it back to Stripe.
- * If Stripe verifies this then it sets up the enrolment for that
+ * This script waits for Payment notification from mobbex,
+ * then double checks that data by sending it back to mobbex.
+ * If mobbex verifies this then it sets up the enrolment for that
  * user.
  *
  * @package    enrol_mobbexpayment
- * @copyright  2019 Dualcube Team
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2021 Mobbex
  */
 
 // Disable moodle specific debug messages and any errors in output,
@@ -39,7 +38,7 @@ require_once($CFG->libdir . '/filelib.php');
 require_login();
 
 $data = new stdClass();
-
+/*
 $data->coupon_id = required_param('coupon_id', PARAM_RAW);
 $data->cmd = required_param('cmd', PARAM_RAW);
 $data->charset = required_param('charset', PARAM_RAW);
@@ -120,13 +119,13 @@ $cost = format_float($cost, 2, false);
 
 try {
 
-    require_once('Stripe/init.php');
+    require_once('mobbex/init.php');
 
-    \Stripe\Stripe::setApiKey($plugin->get_config('secretkey'));
+    \mobbex\mobbex::setApiKey($plugin->get_config('secretkey'));
 
     $iscoupon = false;
     if ($data->coupon_id) {
-        $coupon = \Stripe\Coupon::retrieve($data->coupon_id);
+        $coupon = \mobbex\Coupon::retrieve($data->coupon_id);
         if (!$coupon->valid) {
             redirect($CFG->wwwroot.'/enrol/index.php?id='.$data->courseid,
             'Coupon Code '.$data->coupon_id.' is not valid!');
@@ -152,15 +151,15 @@ try {
         if ($iscoupon) {
             $customerarray["coupon"] = $data->coupon_id;
         }
-        $charge1 = \Stripe\Customer::create($customerarray);
+        $charge1 = \mobbex\Customer::create($customerarray);
         $data->receiver_id = $charge1->id;
     } else {
         if ($iscoupon) {
-            $cu = \Stripe\Customer::retrieve($checkcustomer->receiver_id);
+            $cu = \mobbex\Customer::retrieve($checkcustomer->receiver_id);
             $cu->coupon = $data->coupon_id;
             $cu->save();
         } else {
-            $cu = \Stripe\Customer::retrieve($checkcustomer->receiver_id);
+            $cu = \mobbex\Customer::retrieve($checkcustomer->receiver_id);
             $cu->coupon = null;
             $cu->save();
         }
@@ -266,34 +265,34 @@ try {
         $a->fullname = $fullname;
         notice(get_string('paymentsorry', '', $a), $destination);
     }
-} catch (Stripe_CardError $e) {
+} catch (mobbex_CardError $e) {
     // Catch the errors in any way you like.
     echo 'Error';
 }
 
 // Catch the errors in any way you like.
 
-catch (Stripe_InvalidRequestError $e) {
-    // Invalid parameters were supplied to Stripe's API.
-    echo 'Invalid parameters were supplied to Stripe\'s API';
+catch (mobbex_InvalidRequestError $e) {
+    // Invalid parameters were supplied to mobbex's API.
+    echo 'Invalid parameters were supplied to mobbex\'s API';
 
-} catch (Stripe_AuthenticationError $e) {
-    // Authentication with Stripe's API failed
+} catch (mobbex_AuthenticationError $e) {
+    // Authentication with mobbex's API failed
     // (maybe you changed API keys recently).
-    echo 'Authentication with Stripe\'s API failed';
+    echo 'Authentication with mobbex\'s API failed';
 
-} catch (Stripe_ApiConnectionError $e) {
-    // Network communication with Stripe failed.
-    echo 'Network communication with Stripe failed';
-} catch (Stripe_Error $e) {
+} catch (mobbex_ApiConnectionError $e) {
+    // Network communication with mobbex failed.
+    echo 'Network communication with mobbex failed';
+} catch (mobbex_Error $e) {
 
     // Display a very generic error to the user, and maybe send
     // yourself an email.
-    echo 'Stripe Error';
+    echo 'mobbex Error';
 } catch (Exception $e) {
 
-    // Something else happened, completely unrelated to Stripe.
-    echo 'Something else happened, completely unrelated to Stripe';
+    // Something else happened, completely unrelated to mobbex.
+    echo 'Something else happened, completely unrelated to mobbex';
 }
 
 /**
@@ -301,7 +300,7 @@ catch (Stripe_InvalidRequestError $e) {
  *
  * @param string $subject
  * @param stdClass $data
- */
+ 
 function message_mobbexpayment_error_to_admin($subject, $data) {
     $admin = get_admin();
     $site = get_site();
@@ -312,7 +311,7 @@ function message_mobbexpayment_error_to_admin($subject, $data) {
         $message .= s($key) ." => ". s($value)."\n";
     }
 
-    $subject = "STRIPE PAYMENT ERROR: ".$subject;
+    $subject = "mobbex PAYMENT ERROR: ".$subject;
     $fullmessage = $message;
     $fullmessagehtml = html_to_text('<p>'.$message.'</p>');
 
@@ -321,4 +320,4 @@ function message_mobbexpayment_error_to_admin($subject, $data) {
     $success = email_to_user($admin, $admin, $subject, $fullmessage, $fullmessagehtml);
     $smtplog = ob_get_contents();
     ob_end_clean();
-}
+}*/
