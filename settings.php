@@ -34,6 +34,9 @@ if (is_siteadmin()) {
     'Mobbex Access Token',
     'Ingrese access token', '', PARAM_TEXT));
 
+    $settings->add(new admin_setting_configcheckbox('enrol_mobbexpayment/test',
+    "Test Mode", '', 0));
+
     $settings->add(new admin_setting_configcheckbox('enrol_mobbexpayment/mailstudents',
     get_string('mailstudents', 'enrol_mobbexpayment'), '', 0));
 

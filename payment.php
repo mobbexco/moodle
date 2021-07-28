@@ -32,6 +32,7 @@ global $DB, $USER, $CFG, $_SESSION;
 //Get variables from configuration and enrol page
 $plugin = enrol_get_plugin('mobbexpayment');
 $apiKey = $plugin->get_config('apikey');
+$test_active = $plugin->get_config('test');
 $accessToken = $plugin->get_config('accesstoken');
 $courseid = $_SESSION['courseid'];
 $tracking_ref = $USER->id."_".$courseid."_".time();
@@ -64,7 +65,7 @@ if (empty($apiKey) || empty($courseid) || empty($amount) || empty($currency) || 
             'reference' => $tracking_ref,
             'currency' => 'ARS',
             'description' => $description,
-            'test' => false, 
+            'test' => $test_active, 
             'return_url' => $CFG->wwwroot.'/enrol/mobbexpayment/validatemobbexpayment.php?reference='.$tracking_ref,
             'webhook' => $CFG->wwwroot.'/enrol/mobbexpayment/webhook.php',
             'redirect' => 0,
