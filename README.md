@@ -19,7 +19,8 @@ This plugin provides integration between Moodle and Mobbex Payment Solution. Wit
 11) Set price and time period of students enrollment.
 
 ## Important Information and Interaction
-1) Mobbex Payment works only on https.
+1) Support Moodle v2.7+
+2) Mobbex Payment works only on https.
 
 ## Changelog
 
