@@ -28,17 +28,9 @@ $functions = array(
     "mobbexpayment_change_status" => array(
         "classname"   => "mobbex_services",
         "methodname"  => "change_status",
-        "classpath"   => "local/webhooks/externallib.php",
+        "classpath"   => "local/mobbexpayment/externallib.php",
         "description" => "Change the status of the enrollment.",
         "type"        => "write"
-    ),
-
-    "mobbexpayment_enroll" => array(
-        "classname"   => "mobbex_services",
-        "methodname"  => "enroll_user",
-        "classpath"   => "local/webhooks/externallib.php",
-        "description" => "Search for services that contain the specified event.",
-        "type"        => "read"
     ),
 
 );

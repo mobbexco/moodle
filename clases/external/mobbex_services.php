@@ -40,6 +40,5 @@ class mobbex_api extends external_api {
 
     public static function mobbexpayment_change_status() {
         global $CFG, $DB;
-        
     }
 }

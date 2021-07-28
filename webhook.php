@@ -37,13 +37,14 @@ if($body_data){
     $result_data =$body_data->data;
     $status_code = $result_data->payment->status->code;
     $reference = $result_data->payment->reference;
-    //get mobbex trasanction from database using payment reference
+    //get mobbex trasanction from database using payment reference/memo
     $transaction = $DB->get_record("enrol_mobbexpayment", array("memo" => $reference));
     if($transaction){
         $plugin = enrol_get_plugin('mobbexpayment');
         $plugininstance = $DB->get_record("enrol", array("courseid" => $transaction->courseid, "enrol" => "mobbexpayment"));
-        if($plugininstance && $status_code == '200')
+        if($plugininstance &&  ($status_code == 4 || $status_code >= 200 && $status_code < 400) )
         {
+            //in case time prediod is set
             if ($plugininstance->enrolperiod) {
                 $timestart = time();
                 $timeend   = $timestart + $plugininstance->enrolperiod;
@@ -51,10 +52,21 @@ if($body_data){
                 $timestart = 0;
                 $timeend   = 0;
             }
+            //payment successful then enrol user
             $plugin->enrol_user($plugininstance, $transaction->userid, $plugininstance->roleid, $timestart, $timeend);
             $transaction->status = "successful";
-            $DB->update_record("enrol_mobbexpayment", $transaction);
+        }elseif($plugininstance &&  ($status_code == '2' || $status_code == '3' || $status_code == '100')){
+            if (!empty($result_data->payment->operation->type) && $result_data->payment->operation->type === 'payment.2-step' && $status_code == 3) {
+                $transaction->status = "authorized";
+            } else {
+                $transaction->status = "on-hold";
+            }
+            
+        }else{
+            //payment went wrong
+            $transaction->status = "failed";
         }
+        $DB->update_record("enrol_mobbexpayment", $transaction);
     }
 }
 

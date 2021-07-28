@@ -17,10 +17,7 @@
 /**
  * Listens for Instant Payment Notification from Mobbex
  *
- * This script waits for Payment notification from Mobbex,
- * then double checks that data by sending it back to Mobbex.
- * If Mobbex verifies this then it sets up the enrolment for that
- * user.
+ * This script allow courses enrolment using mobbexpayment
  *
  * @package    enrol_mobbexpayment
  * @copyright  2021 Mobbex
@@ -92,19 +89,17 @@ global $CFG;
                 $costvalue = str_replace(".", "", $cost);
                 if ($costvalue == 000) {  ?>
                     <div id="amountequalzeromobbex">
-                        <button id="card-button-zero-mobbex">
-                            Enrol Now
+                        <strong>
+                        <div id="card-element"></div> <br>
+                        <button id="card-button-mobbex">
+                            Submit Payment
                         </button>
+                        <div id="transaction-status-mobbex">
+                            <center> Your transaction is processing. Please wait... </center>
+                        </div>
+                        </strong>
                     </div>
                     <br>
-                    <script type="text/javascript">
-                        $(document.body).on('click', '#card-button-zero-mobbex' ,function(){
-                            var cost = "<?php echo str_replace(".", "", $cost); ?>";
-                            if (cost == 000) {
-                                document.getElementById("mobbexformfree").submit();
-                            }
-                        });
-                    </script>
             <?php } else { ?>
 
                 <!-- placeholder for Elements -->
@@ -138,11 +133,9 @@ global $CFG;
             var cardholderName = "<?php echo $userfullname; ?>";
             var emailId = "<?php echo $USER->email; ?>";
             var amount = "<?php echo $cost; ?>";
-            console.info(amount);
             var cardButton = document.getElementById('card-button-mobbex');
             var status = 0;
             var postal = null;
-            console.log("<?php echo $CFG->wwwroot; ?>/enrol/mobbexpayment/payment.php");
 
             cardButton.addEventListener('click', function(event) {
                 if (event.error) {
@@ -167,7 +160,6 @@ global $CFG;
                         },
                     })
                     .done(function( data ) {
-                        console.info( "Data Saved: "+ data );
                         window.location.href = data;
                     })
                     .fail(function() {
@@ -178,32 +170,6 @@ global $CFG;
             });
 
         </script>
-
-    <form id="mobbexformfree" action="<?php
-        echo "$CFG->wwwroot/enrol/mobbexpayment/free_enrol.php"?>" method="post">
-        <input type="hidden" name="coupon_id" value="<?php p($couponid) ?>" class="coupon_id" />
-        <input type="hidden" name="cmd" value="_xclick" />
-        <input type="hidden" name="charset" value="utf-8" />
-        <input type="hidden" name="item_name" value="<?php p($coursefullname) ?>" />
-        <input type="hidden" name="item_number" value="<?php p($courseshortname) ?>" />
-        <input type="hidden" name="quantity" value="1" />
-        <input type="hidden" name="on0" value="<?php print_string("user") ?>" />
-        <input type="hidden" name="os0" value="<?php p($userfullname) ?>" />
-        <input type="hidden" name="custom" value="<?php echo "{$USER->id}-{$course->id}-{$instance->id}" ?>" />
-        <input type="hidden" name="currency_code" value="<?php p($instance->currency) ?>" />
-        <input type="hidden" name="amount" value="<?php p($cost) ?>" />
-        <input type="hidden" name="for_auction" value="false" />
-        <input type="hidden" name="no_note" value="1" />
-        <input type="hidden" name="no_shipping" value="1" />
-        <input type="hidden" name="rm" value="2" />
-        <input type="hidden" name="cbt" value="<?php print_string("continuetocourse") ?>" />
-        <input type="hidden" name="first_name" value="<?php p($userfirstname) ?>" />
-        <input type="hidden" name="last_name" value="<?php p($userlastname) ?>" />
-        <input type="hidden" name="address" value="<?php p($useraddress) ?>" />
-        <input type="hidden" name="city" value="<?php p($usercity) ?>" />
-        <input type="hidden" name="email" value="<?php p($USER->email) ?>" />
-        <input type="hidden" name="country" value="<?php p($USER->country) ?>" />
-    </form>
 
 </div>
 </div>
