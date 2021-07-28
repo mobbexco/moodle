@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Stript enrolments plugin settings and presets.
+ * Stript enrolments Mobbexpayment plugin settings and presets.
  *
  * @package    enrol_mobbexpayment
  * @copyright  2021 Mobbex

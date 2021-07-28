@@ -22,7 +22,7 @@
  */
 
 require('../../config.php');
-
+//Get params from Moodle course page
 $enrolid = required_param('enrolid', PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_BOOL);
 $instance = $DB->get_record('enrol', array('id' => $enrolid, 'enrol' => 'mobbexpayment'), '*', MUST_EXIST);
