@@ -73,6 +73,7 @@ global $CFG;
             <input id="form_data_new_data" type="hidden" name="data" value="" />
         </form>
 
+    <?php if($_SERVER['HTTPS']!="on") { ?>
         <div id="reload">
             <div id="new_coupon" style="margin-bottom:10px;"></div>
             <?php
@@ -115,7 +116,7 @@ global $CFG;
                     </strong>
                 </div>
             <?php } ?>
-
+        
         
         <script type="text/javascript">
             var style = {
@@ -170,7 +171,7 @@ global $CFG;
             });
 
         </script>
-
+    <?php } ?>
 </div>
 </div>
 
