@@ -28,9 +28,9 @@ define('NO_DEBUG_DISPLAY', true);
 //Add Moodle config files
 require_once('../../config.php');
 require_once($CFG->libdir.'/enrollib.php');
-//Retrive params froms POST call
+//Retrive params from POST call
 $res = [];
-parse_str(file_get_contents('php://input'), $res);
+parse_str(file_get_contents('php://input'), $res);//Use it for php older versions
 $body_data = json_decode($res['body']);
 if($body_data){
     //obtain useful info
@@ -40,7 +40,7 @@ if($body_data){
     //get mobbex trasanction from database using payment reference/memo
     $transaction = $DB->get_record("enrol_mobbexpayment", array("memo" => $reference));
     if($transaction){
-        $plugin = enrol_get_plugin('mobbexpayment');
+        $plugin = enrol_get_plugin('mobbexpayment');//get mobbexpayment instance
         $plugininstance = $DB->get_record("enrol", array("courseid" => $transaction->courseid, "enrol" => "mobbexpayment"));
         if($plugininstance &&  ($status_code == 4 || $status_code >= 200 && $status_code < 400) )
         {
@@ -66,6 +66,7 @@ if($body_data){
             //payment went wrong
             $transaction->status = "failed";
         }
+        //Set transaction new state
         $DB->update_record("enrol_mobbexpayment", $transaction);
     }
 }

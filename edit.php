@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Used to asociate a course with Mobbexpayment
  * Course wise edit settings.
  *
  * Adds new instance of enrol_mobbexpayment to specified course
@@ -92,7 +93,6 @@ if ($mform->is_cancelled()) {
                                       ),
                         'roleid' => $data->roleid,
                         'enrolperiod' => $data->enrolperiod,
-                        //'customint3' => $data->customint3,
                         'enrolstartdate' => $data->enrolstartdate,
                         'enrolenddate' => $data->enrolenddate);
         $plugin->add_instance($course, $fields);

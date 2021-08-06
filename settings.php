@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Stript enrolments Mobbexpayment plugin settings and presets.
+ * Mobbex enrolments Mobbexpayment plugin settings and presets.
  *
  * @package    enrol_mobbexpayment
  * @copyright  2021 Mobbex
@@ -27,16 +27,17 @@ if (is_siteadmin()) {
 
     $settings->add(new admin_setting_heading('enrol_mobbexpayment_settings',
     '', get_string('pluginname_desc', 'enrol_mobbexpayment')));
-
+    //API KEY
     $settings->add(new admin_setting_configtext('enrol_mobbexpayment/apikey', 'Mobbex Api Key',
     'Ingrese Api Key', '', PARAM_TEXT));
+    //ACCESS TOKEN
     $settings->add(new admin_setting_configtext('enrol_mobbexpayment/accesstoken',
     'Mobbex Access Token',
     'Ingrese access token', '', PARAM_TEXT));
-
+    //TEST MODE
     $settings->add(new admin_setting_configcheckbox('enrol_mobbexpayment/test',
     "Test Mode", '', 0));
-
+    //GENERAL SETTINGS, can be removed
     $settings->add(new admin_setting_configcheckbox('enrol_mobbexpayment/mailstudents',
     get_string('mailstudents', 'enrol_mobbexpayment'), '', 0));
 

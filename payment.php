@@ -16,6 +16,7 @@
 
 /**
  * Creates Mobbex checkout after ajax call from enrol page
+ * using course and user data
  * Only logged users can enrol
  *
  * @package    enrol_mobbexpayment
@@ -24,36 +25,39 @@
 
 // Moodle global variables
 require_once('../../config.php');
+//Only logged user from here
 require_login();
 require_once($CFG->libdir.'/filelib.php');
 use curl;
 global $DB, $USER, $CFG, $_SESSION;
 
-//Get variables from configuration and enrol page
+//Get variables from Mobbex configuration 
 $plugin = enrol_get_plugin('mobbexpayment');
 $apiKey = $plugin->get_config('apikey');
+//Get params from enrol.php
 $test_active = $plugin->get_config('test');
 $accessToken = $plugin->get_config('accesstoken');
 $courseid = $_SESSION['courseid'];
-$tracking_ref = $USER->id."_".$courseid."_".time();
 $currency = $_SESSION['currency'];
 $description = $_SESSION['description'];
 $receiptemail = required_param('receiptemail', PARAM_RAW);
 $amount = required_param('amount', PARAM_RAW);
+$tracking_ref = $USER->id."_".$courseid."_".time();// reference string is unique for every inscription (using time() function)
 
 if (empty($apiKey) || empty($courseid) || empty($amount) || empty($currency) || empty($description) || empty($accessToken)) {
-    //fail if there is a missing param
+    //Fail if there is a missing param
     redirect($CFG->wwwroot.'/course/view.php?id='.$courseid);
 } else {
     if($amount>0){
-        //set API configuration variables
+        //Set API configuration variables
         $headers = array(
             'cache-control: no-cache',
             'content-type: application/json',
             'x-api-key: ' . $apiKey,
             'x-access-token: ' . $accessToken,
         );
-
+        //Set Costumer data
+        //TODO: Add DNI
         $customer = [
             'name' => $USER->username,
             'email' => $receiptemail,
@@ -66,7 +70,7 @@ if (empty($apiKey) || empty($courseid) || empty($amount) || empty($currency) || 
             'currency' => 'ARS',
             'description' => $description,
             'test' => $test_active, 
-            'return_url' => $CFG->wwwroot.'/enrol/mobbexpayment/validatemobbexpayment.php?reference='.$tracking_ref,
+            'return_url' => $CFG->wwwroot.'/enrol/mobbexpayment/validatemobbexpayment.php?reference='.$tracking_ref,//reference is used when Mobbex return from payment page to identify the transaction
             'webhook' => $CFG->wwwroot.'/enrol/mobbexpayment/webhook.php',
             'redirect' => 0,
             'total' => $amount,
@@ -96,12 +100,12 @@ if (empty($apiKey) || empty($courseid) || empty($amount) || empty($currency) || 
         } else {
             $result = json_decode($response);	
             if ($result->result) {
-                //If checkout created successful, then create mobbex transaction in database
+                //If checkout created successful, then create Mobbex transaction in database.
                 $data = new stdClass();
                 $data->courseid = $courseid;
                 $data->userid = $USER->id;
                 $data->transactionid = $result->data->id;
-                $data->memo = $tracking_ref;
+                $data->memo = $tracking_ref;//Save reference as MEMO, its goin to be use when Mobbex confirm payment.
                 $data->status = "created";
                 $data->receiver_email = $receiptemail;
                 $data->amount = $amount;

@@ -18,11 +18,11 @@
  * Listens for Instant Payment Notification from Mobbex
  *
  * This script waits for Payment notification from Mobbex after payment
- * is made.
+ * is made. It use REFERENCE to identify transaction paid.
  * @package    enrol_Mobbexpayment
  * @copyright  2021 Mobbex
  */
-
+//TODO: ADD USER NAME IN SUCCESS/ERROR MESSAGES
 // Disable moodle specific debug messages and any errors in output,
 // comment out when debugging or better look into error log!
 define('NO_DEBUG_DISPLAY', true);

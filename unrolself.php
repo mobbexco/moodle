@@ -16,6 +16,7 @@
 
 /**
  * Mobbex enrolment plugin - support for user self unenrolment.
+ * This must be setted in plugin configuration
  *
  * @package    enrol_mobbexpayment
  * @copyright  2021 Mobbex
